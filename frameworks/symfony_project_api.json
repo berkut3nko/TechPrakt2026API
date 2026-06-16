@@ -1,12 +1,29 @@
 {
 	"info": {
-		"name": "Symfony Project API",
-		"description": "CRUD operations for the Project entity in Symfony",
+		"name": "Symfony Project Management API",
+		"description": "# 🚀 Enterprise Project Management API (Symfony Core)\n\nWelcome to the official documentation for the Symfony-based Project Management API. This collection demonstrates pure, enterprise-grade REST interactions using Symfony 7 and Doctrine ORM.\n\n---\n\n## 📋 1. Architecture Overview\nUnlike auto-magic frameworks, this API relies on strict Entity mapping and manual request handling via `AbstractController`. Data flow is strictly controlled by Doctrine's EntityManager, ensuring memory safety and transactional integrity.\n\n---\n\n## 🛠 2. Technology Stack\n| Component | Technology | Version | Description |\n|-----------|------------|---------|-------------|\n| **Core Framework** | Symfony | 7.x | High-performance, strictly typed PHP framework. |\n| **Runtime** | PHP | 8.2+ | Server-side execution engine with JIT. |\n| **Database** | PostgreSQL/MySQL | Configurable | Primary data storage. |\n| **ORM** | Doctrine | 3.x | Data Mapper pattern implementation (not Active Record). |\n| **Routing** | Attributes | Native | PHP 8 Attributes (`#[Route]`) used for endpoint mapping. |\n\n---\n\n## 🗄 3. Database Schema Mapping (`Project` Entity)\nThe API represents the following Doctrine Entity structure in the database:\n\n| Column Name | Doctrine Type | PHP Type | Constraints / Description |\n|-------------|---------------|----------|---------------------------|\n| `id` | `integer` | `int` | `#[ORM\\Id]`, `#[ORM\\GeneratedValue]` |\n| `name` | `string` | `string` | `length: 255`, Cannot be null. |\n| `description` | `text` | `?string`| `nullable: true`. Long-form text field. |\n| `status` | `string` | `string` | Managed via strict string checks (`todo`, `in_progress`, `done`). |\n\n---\n\n## 📡 4. Endpoints Summary\n\n| HTTP Method | URI Path | Controller Action | Expected Success Code |\n|-------------|----------|-------------------|-----------------------|\n| `GET` | `/api/projects` | `ProjectController::index` | `200 OK` |\n| `POST` | `/api/projects` | `ProjectController::store` | `201 Created` |\n| `GET` | `/api/projects/{id}` | `ProjectController::show` | `200 OK` |\n| `PATCH` | `/api/projects/{id}` | `ProjectController::update` | `200 OK` |\n| `DELETE` | `/api/projects/{id}` | `ProjectController::destroy` | `204 No Content` |\n\n---\n\n## 🛡 5. Error Handling Mechanism\nIn this Symfony implementation, errors are returned explicitly mapped via `JsonResponse`. If the payload is incomplete, the controller terminates execution early to prevent Doctrine exceptions.\n\n| Status Code | Reason | Typical Cause |\n|-------------|--------|---------------|\n| `400 Bad Request` | Missing Data | The `name` or `status` keys are entirely missing from the raw JSON payload. |\n| `404 Not Found` | Entity Missing | `EntityManager->getRepository()->find($id)` returned `null`. |\n| `500 Internal Error` | Uncaught Exception | Typically caused by malformed JSON crashing `json_decode`. |\n\n---\n\n## 🧪 6. Automated Testing\nThis collection leverages Postman's built-in testing features to validate responses against the Symfony backend. Every endpoint contains a `Tests` script to ensure data integrity and correct status code assignment.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
 			"name": "1. Get All Projects (GET)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response is a valid JSON array\", function () {",
+							"    pm.expect(pm.response.json()).to.be.an('array');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [
@@ -18,14 +35,82 @@
 				"url": {
 					"raw": "http://127.0.0.1:8000/api/projects",
 					"protocol": "http",
-					"host": ["127", "0", "0", "1"],
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
 					"port": "8000",
-					"path": ["api", "projects"]
+					"path": [
+						"api",
+						"projects"
+					]
+				},
+				"description": "### 🎯 Endpoint Purpose\nExecutes a `findAll()` query via Doctrine Repository to retrieve all Project entities, mapping them manually to arrays to avoid circular reference serialization errors.\n\n### 📦 Returns\nA JSON array of available projects. "
+			},
+			"response": [
+				{
+					"name": "Success Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/projects",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"projects"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"id\": 1,\n        \"name\": \"Legacy System Migration\",\n        \"description\": \"Migrate legacy PHP 5.6 app to Symfony 7.\",\n        \"status\": \"in_progress\"\n    }\n]"
 				}
-			}
+			]
 		},
 		{
 			"name": "2. Create Project (POST)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201 Created\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Symfony returns the created entity with an ID\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('id');",
+							"    pm.expect(jsonData.name).to.eql(\"Infrastructure Setup\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
@@ -40,19 +125,135 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"Database Migration\",\n    \"description\": \"Migrate legacy DB to PostgreSQL\",\n    \"status\": \"todo\"\n}"
+					"raw": "{\n    \"name\": \"Infrastructure Setup\",\n    \"description\": \"Setup Docker containers and CI/CD pipelines.\",\n    \"status\": \"todo\"\n}"
 				},
 				"url": {
 					"raw": "http://127.0.0.1:8000/api/projects",
 					"protocol": "http",
-					"host": ["127", "0", "0", "1"],
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
 					"port": "8000",
-					"path": ["api", "projects"]
+					"path": [
+						"api",
+						"projects"
+					]
+				},
+				"description": "### 🎯 Endpoint Purpose\nInstantiates a new `Project` entity, maps the JSON payload to setter methods, persists it via `EntityManager->persist()`, and commits the transaction using `flush()`.\n\n### 📝 Validation Logic\nThis endpoint manually verifies `isset($data['name'])` and `isset($data['status'])` before attempting to create the entity. Failure to provide these keys returns a strict `400 Bad Request`."
+			},
+			"response": [
+				{
+					"name": "Successful Creation",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Infrastructure Setup\",\n    \"description\": \"Setup Docker containers and CI/CD pipelines.\",\n    \"status\": \"todo\"\n}"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/projects",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"projects"
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"id\": 2,\n    \"name\": \"Infrastructure Setup\",\n    \"status\": \"todo\"\n}"
+				},
+				{
+					"name": "Missing Fields Payload (400 Bad Request)",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"I forgot the name and status\"\n}"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/projects",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"projects"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": \"Missing required fields: name, status\"\n}"
 				}
-			}
+			]
 		},
 		{
 			"name": "3. Get Single Project (GET)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [
@@ -64,14 +265,83 @@
 				"url": {
 					"raw": "http://127.0.0.1:8000/api/projects/1",
 					"protocol": "http",
-					"host": ["127", "0", "0", "1"],
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
 					"port": "8000",
-					"path": ["api", "projects", "1"]
+					"path": [
+						"api",
+						"projects",
+						"1"
+					]
+				},
+				"description": "### 🎯 Endpoint Purpose\nUses Doctrine's `find($id)` method to retrieve a specific entity by its primary key.\n\n### 🛑 Potential Errors\nReturns `404 Not Found` if the EntityManager cannot locate an entity with the specified ID."
+			},
+			"response": [
+				{
+					"name": "Entity Not Found (404)",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/projects/9999",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"projects",
+								"9999"
+							]
+						}
+					},
+					"status": "Not Found",
+					"code": 404,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": \"Project not found\"\n}"
 				}
-			}
+			]
 		},
 		{
 			"name": "4. Update Project (PATCH)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Status updated to done\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql(\"done\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "PATCH",
 				"header": [
@@ -91,14 +361,86 @@
 				"url": {
 					"raw": "http://127.0.0.1:8000/api/projects/1",
 					"protocol": "http",
-					"host": ["127", "0", "0", "1"],
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
 					"port": "8000",
-					"path": ["api", "projects", "1"]
+					"path": [
+						"api",
+						"projects",
+						"1"
+					]
+				},
+				"description": "### 🎯 Endpoint Purpose\nModifies an existing entity. The controller extracts the specific fields from the JSON payload, calls the corresponding setters on the Entity (e.g., `setStatus()`), and flushes the changes back to the database.\n\n### 💡 Behavior\nFields not present in the JSON payload are completely ignored, keeping the existing database values intact."
+			},
+			"response": [
+				{
+					"name": "Successful Update",
+					"originalRequest": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"done\"\n}"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/projects/1",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"projects",
+								"1"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"id\": 1,\n    \"name\": \"Legacy System Migration\",\n    \"description\": \"Migrate legacy PHP 5.6 app to Symfony 7.\",\n    \"status\": \"done\"\n}"
 				}
-			}
+			]
 		},
 		{
 			"name": "5. Delete Project (DELETE)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204 No Content\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "DELETE",
 				"header": [
@@ -110,11 +452,57 @@
 				"url": {
 					"raw": "http://127.0.0.1:8000/api/projects/1",
 					"protocol": "http",
-					"host": ["127", "0", "0", "1"],
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
 					"port": "8000",
-					"path": ["api", "projects", "1"]
+					"path": [
+						"api",
+						"projects",
+						"1"
+					]
+				},
+				"description": "### 🎯 Endpoint Purpose\nExecutes `EntityManager->remove($project)` followed by `flush()`, deleting the record entirely.\n\n### 📦 Expected Outcome\nA `204 No Content` HTTP response indicating success without returning data."
+			},
+			"response": [
+				{
+					"name": "Successful Deletion",
+					"originalRequest": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/projects/1",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"projects",
+								"1"
+							]
+						}
+					},
+					"status": "No Content",
+					"code": 204,
+					"_postman_previewlanguage": "plain",
+					"header": [],
+					"cookie": [],
+					"body": ""
 				}
-			}
+			]
 		}
 	]
 }
