@@ -1,0 +1,120 @@
+{
+	"info": {
+		"name": "Symfony Project API",
+		"description": "CRUD operations for the Project entity in Symfony",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Get All Projects (GET)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/projects",
+					"protocol": "http",
+					"host": ["127", "0", "0", "1"],
+					"port": "8000",
+					"path": ["api", "projects"]
+				}
+			}
+		},
+		{
+			"name": "2. Create Project (POST)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Database Migration\",\n    \"description\": \"Migrate legacy DB to PostgreSQL\",\n    \"status\": \"todo\"\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/projects",
+					"protocol": "http",
+					"host": ["127", "0", "0", "1"],
+					"port": "8000",
+					"path": ["api", "projects"]
+				}
+			}
+		},
+		{
+			"name": "3. Get Single Project (GET)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/projects/1",
+					"protocol": "http",
+					"host": ["127", "0", "0", "1"],
+					"port": "8000",
+					"path": ["api", "projects", "1"]
+				}
+			}
+		},
+		{
+			"name": "4. Update Project (PATCH)",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"status\": \"done\"\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/projects/1",
+					"protocol": "http",
+					"host": ["127", "0", "0", "1"],
+					"port": "8000",
+					"path": ["api", "projects", "1"]
+				}
+			}
+		},
+		{
+			"name": "5. Delete Project (DELETE)",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/projects/1",
+					"protocol": "http",
+					"host": ["127", "0", "0", "1"],
+					"port": "8000",
+					"path": ["api", "projects", "1"]
+				}
+			}
+		}
+	]
+}
